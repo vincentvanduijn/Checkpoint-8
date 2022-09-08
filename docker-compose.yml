@@ -1,0 +1,15 @@
+version: '2.4'
+services:
+  db:
+    image: mysql
+    container_name: msql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - vincent_van_duijn:/var/lib/mysql
+
+volumes:
+  vincent_van_duijn:
+
