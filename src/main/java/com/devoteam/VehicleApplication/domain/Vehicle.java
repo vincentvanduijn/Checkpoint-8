@@ -1,42 +1,46 @@
 package com.devoteam.VehicleApplication.domain;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
+import javax.persistence.*;
 import java.util.Date;
 
-@Data
-@Builder
-public class Vehicle {
 
+@Entity
+// Zoeken juiste annotation voor alle constructors
+public class Vehicle {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private Date createdOn;
+    @ManyToOne
+    @JoinColumn(name = "automaker_ID")
     private Automaker automaker;
-    private String model;
+    private String name;
     private String color;
     private int year;
+    @ManyToOne
+    @JoinColumn(name = "type_ID")
     private VehicleType vehicleType;
 
-    public Vehicle(int id, Date createdOn, Automaker automaker, String model, String color, int year, VehicleType vehicleType) {
-        this.id = id;
-        this.createdOn = createdOn;
-        this.automaker = automaker;
-        this.model = model;
-        this.color = color;
-        this.year = year;
-        this.vehicleType = vehicleType;
-    }
-
-    @Override
-    public String toString() {
-        return  "\n#------------------------------------------------#\n" +
-                "Model: " + model + "\n" +
-                "Id Vehicle: " + id + '\n' +
-                automaker + '\n' +
-                vehicleType + "\n" +
-                "Color: " + color + "\n" +
-                "Year: " + year + "\n" +
-                "Created on: " + createdOn + "\n"
-                ;
-    }
+//    public VehicleType getVehicleType() {
+//        return vehicleType;
+//    }
+//
+//    public void setVehicleType(VehicleType vehicleType) {
+//        this.vehicleType = vehicleType;
+//    }
+//
+//    @Override
+//    public String toString() {
+//        return  "\n#------------------------------------------------#\n" +
+//                "Model: " + name + "\n" +
+//                "Id Vehicle: " + id + '\n' +
+//                automaker + '\n' +
+//                vehicleType + "\n" +
+//                "Color: " + color + "\n" +
+//                "Year: " + year + "\n" +
+//                "Created on: " + createdOn + "\n"
+//                ;
+//    }
 }

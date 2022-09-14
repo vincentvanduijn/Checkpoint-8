@@ -91,3 +91,21 @@
 // To Do: Add the needed exceptions 
 // To Do: After refactoring the code to the 4th point (mySQL running in a docker compose file) of checkpoint 8, make sure you look at the tips from last checkpoint 
 // to Do: Check which Lombok which annotations to use
+
+//---------12-9-2022------------
+// To Do: Rework the menu options to GET, POST, DELETE, PUT
+// To Do: Add the needed exceptions 
+// To Do: After refactoring the code to the 4th point (mySQL running in a docker compose file) of checkpoint 8, make sure you look at the tips from last checkpoint 
+// to Do: Check which Lombok which annotations to use
+
+//---------13-9-2022------------
+// To Do: Rework the menu options to GET, POST, DELETE, PUT
+// To Do: Add the needed exceptions 
+// To Do: After refactoring the code to the 4th point (mySQL running in a docker compose file) of checkpoint 8, make sure you look at the tips from last checkpoint 
+// to Do: Check which Lombok which annotations to use
+
+//---------14-9-2022------------
+// Updated: Rework the menu options to GET, POST, DELETE, PUT
+// To Do: Add the needed exceptions 
+// To Do: After refactoring the code to the 4th point (mySQL running in a docker compose file) of checkpoint 8, make sure you look at the tips from last checkpoint 
+// to Do: Check which Lombok which annotations to use

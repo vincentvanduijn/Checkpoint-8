@@ -2,7 +2,7 @@ version: '2.4'
 services:
   db:
     image: mysql
-    container_name: msql
+    container_name: msql-8
     environment:
       MYSQL_ROOT_PASSWORD: root
     ports:

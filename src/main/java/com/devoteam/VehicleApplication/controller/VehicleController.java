@@ -1,26 +1,53 @@
 package com.devoteam.VehicleApplication.controller;
 
-import com.devoteam.VehicleApplication.domain.Automaker;
 import com.devoteam.VehicleApplication.domain.Vehicle;
-import com.devoteam.VehicleApplication.domain.VehicleType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.devoteam.VehicleApplication.repository.VehicleRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("vehicle")
+@RequestMapping("vehicles")
+@Slf4j
+@RequiredArgsConstructor
 public class VehicleController {
 
-    //localhost:8080/vehicle/list
+    //localhost:8080/vehicles
+    private final VehicleRepository vehicleRepository;
 
-//    @Autowired
-//    private DateUtil dateUtil;
+    @GetMapping
+    public ResponseEntity<List<Vehicle>> listAll() {
+        return ResponseEntity.ok(vehicleRepository.listAll());
+    }
 
-    @GetMapping(path = "/list")
-    public List<Vehicle> listAll() {
-        return List.of(new Vehicle(1, new Date(), Automaker.builder().build(), "Malibu", "Red", 2000, VehicleType.builder().build()));
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<Vehicle> findById(@PathVariable int id) {
+        return ResponseEntity.ok(VehicleRepository.findById(id));
+    }
+
+    @GetMapping(path = "/find")
+    public ResponseEntity<List<Vehicle>> findByName(@RequestParam(value = "name") String name) {
+        return ResponseEntity.ok(VehicleRepository.findByName(name));
+    }
+
+    @PostMapping
+    public ResponseEntity<Vehicle> save(@RequestBody Vehicle vehicle) {
+        return ResponseEntity.ok(VehicleRepository.save(vehicle));
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<Vehicle> delete(@PathVariable int id) {
+        VehicleRepository.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping
+    public ResponseEntity<Vehicle> update(@RequestBody Vehicle vehicle) {
+        VehicleRepository.update(vehicle);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

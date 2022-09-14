@@ -3,16 +3,12 @@ package com.devoteam.VehicleApplication;
 import com.devoteam.VehicleApplication.service.ApplicationService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
 
 import java.util.Scanner;
 
 @Log4j2
-@EnableAutoConfiguration
 @SpringBootApplication
-@ComponentScan(basePackages = "com.devoteam.VehicleApplication.controller")
 public class VehicleApplication {
 
     public static void main(String[] args) {
@@ -27,18 +23,18 @@ public class VehicleApplication {
             applicationService.menuLogic();
             int automakerMenuChoice = inputForSwitchMenu.nextInt();
 
-            switch (automakerMenuChoice) {
-                case 1 -> applicationService.menuOption1FindByAutomaker();
-                case 2 -> applicationService.menuOption2FindByModel();
-                case 3 -> applicationService.menuOption3SaveByModel();
-                case 4 -> applicationService.menuOption4UpdateByModel();
-                case 5 -> applicationService.menuOption5DeleteByModel();
-                case 6 -> applicationService.menuOption6ShowAllVehicles();
-                case 0 -> {
-                    return;
-                }
-                default -> log.info("Please, select on of the above options");
-            }
+//            switch (automakerMenuChoice) {
+//                case 1 -> applicationService.menuOption1FindByAutomaker();
+//                case 2 -> applicationService.menuOption2FindByModel();
+//                case 3 -> applicationService.menuOption3SaveByModel();
+//                case 4 -> applicationService.menuOption4UpdateByModel();
+//                case 5 -> applicationService.menuOption5DeleteByModel();
+//                case 6 -> applicationService.menuOption6ShowAllVehicles();
+//                case 0 -> {
+//                    return;
+//                }
+//                default -> log.info("Please, select on of the above options");
+//            }
 
             boolean gettingAnswerFromUser = true;
             while (gettingAnswerFromUser) {

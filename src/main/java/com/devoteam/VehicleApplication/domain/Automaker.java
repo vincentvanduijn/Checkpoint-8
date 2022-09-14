@@ -1,19 +1,26 @@
 package com.devoteam.VehicleApplication.domain;
 
-import lombok.Builder;
-import lombok.Value;
+import lombok.NoArgsConstructor;
 
-@Value
-@Builder
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
+@NoArgsConstructor
 public class Automaker {
-    String name;
-    int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    private String name;
 
-    @Override
-    public String toString() {
-        return "Automaker " +
-                "Name: " + name + '\n' +
-                "Automaker ID: " + id
-                ;
-    }
+
+//    @Override
+//    public String toString() {
+//        return "Automaker " +
+//                "Name: " + name + '\n' +
+//                "Automaker ID: " + id
+//                ;
+//    }
 }
