@@ -1,46 +1,45 @@
 package com.devoteam.VehicleApplication.domain;
 
 import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.util.Date;
-
-
+import java.util.Objects;
 @Entity
-// Zoeken juiste annotation voor alle constructors
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 public class Vehicle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private Date createdOn;
+    private final Integer id;
+    @Column(nullable = false)
+    private final Date createdOn;
     @ManyToOne
     @JoinColumn(name = "automaker_ID")
-    private Automaker automaker;
-    private String name;
-    private String color;
-    private int year;
+    private final Automaker automaker;
+    @Column(nullable = false)
+    private final String name;
+    @Column(nullable = false)
+    private final String color;
+    @Column(nullable = false)
+    private final int year;
     @ManyToOne
     @JoinColumn(name = "type_ID")
-    private VehicleType vehicleType;
+    private final VehicleType vehicleType;
 
-//    public VehicleType getVehicleType() {
-//        return vehicleType;
-//    }
-//
-//    public void setVehicleType(VehicleType vehicleType) {
-//        this.vehicleType = vehicleType;
-//    }
-//
-//    @Override
-//    public String toString() {
-//        return  "\n#------------------------------------------------#\n" +
-//                "Model: " + name + "\n" +
-//                "Id Vehicle: " + id + '\n' +
-//                automaker + '\n' +
-//                vehicleType + "\n" +
-//                "Color: " + color + "\n" +
-//                "Year: " + year + "\n" +
-//                "Created on: " + createdOn + "\n"
-//                ;
-//    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Vehicle vehicle = (Vehicle) o;
+        return id != null && Objects.equals(id, vehicle.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

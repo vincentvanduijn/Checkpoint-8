@@ -1,7 +1,7 @@
 package com.devoteam.VehicleApplication.controller;
 
 import com.devoteam.VehicleApplication.domain.Vehicle;
-import com.devoteam.VehicleApplication.repository.VehicleRepository;
+import com.devoteam.VehicleApplication.service.VehicleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,38 +16,37 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VehicleController {
 
-    //localhost:8080/vehicles
-    private final VehicleRepository vehicleRepository;
+    private final VehicleService vehicleService;
 
     @GetMapping
     public ResponseEntity<List<Vehicle>> listAll() {
-        return ResponseEntity.ok(vehicleRepository.listAll());
+        return ResponseEntity.ok(vehicleService.listAll());
     }
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<Vehicle> findById(@PathVariable int id) {
-        return ResponseEntity.ok(VehicleRepository.findById(id));
+        return ResponseEntity.ok(vehicleService.findById(id));
     }
 
     @GetMapping(path = "/find")
     public ResponseEntity<List<Vehicle>> findByName(@RequestParam(value = "name") String name) {
-        return ResponseEntity.ok(VehicleRepository.findByName(name));
+        return ResponseEntity.ok(vehicleService.findByName(name));
     }
 
     @PostMapping
     public ResponseEntity<Vehicle> save(@RequestBody Vehicle vehicle) {
-        return ResponseEntity.ok(VehicleRepository.save(vehicle));
+        return ResponseEntity.ok(vehicleService.save(vehicle));
     }
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<Vehicle> delete(@PathVariable int id) {
-        VehicleRepository.delete(id);
+        vehicleService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping
     public ResponseEntity<Vehicle> update(@RequestBody Vehicle vehicle) {
-        VehicleRepository.update(vehicle);
+        vehicleService.update(vehicle);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
