@@ -116,3 +116,9 @@
 // To Do: Add the needed exceptions 
 // To Do: After refactoring the code to the 4th point (mySQL running in a docker compose file) of checkpoint 8, make sure you look at the tips from last checkpoint 
 // To Do: Talk with Jens about the pro's and con's of the different annotations between Lombok and Spring
+
+//---------16-9-2022------------
+// Updated: Add the needed exceptions 
+// To Do: After refactoring the code to the 4th point (mySQL running in a docker compose file) of checkpoint 8, make sure you look at the tips from last checkpoint 
+// To Do: For the Delete option, check if you can print the deleted object
+// Tip: Pageable String can be switched with Asc, Desc 

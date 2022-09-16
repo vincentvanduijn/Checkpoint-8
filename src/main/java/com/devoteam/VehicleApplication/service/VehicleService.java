@@ -5,8 +5,11 @@ import com.devoteam.VehicleApplication.repository.VehicleRepository;
 import com.devoteam.VehicleApplication.util.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Log4j2
@@ -24,7 +27,7 @@ public class VehicleService {
     public Vehicle findById(int id) {
         return utils.findVehicle(id, vehicleRepository);
     }
-
+    @Transactional
     public Vehicle save(Vehicle vehicle) {
         return vehicleRepository.save(vehicle);
     }
@@ -38,7 +41,7 @@ public class VehicleService {
         vehicleRepository.save(vehicle);
     }
 
-    public List<Vehicle> listAll() {
-        return vehicleRepository.findAll();
+    public Page<Vehicle> listAll(Pageable pageable) {
+        return vehicleRepository.findAll(pageable);
     }
 }

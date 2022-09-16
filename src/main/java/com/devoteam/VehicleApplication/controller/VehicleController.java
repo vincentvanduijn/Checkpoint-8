@@ -4,10 +4,13 @@ import com.devoteam.VehicleApplication.domain.Vehicle;
 import com.devoteam.VehicleApplication.service.VehicleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -19,8 +22,8 @@ public class VehicleController {
     private final VehicleService vehicleService;
 
     @GetMapping
-    public ResponseEntity<List<Vehicle>> listAll() {
-        return ResponseEntity.ok(vehicleService.listAll());
+    public ResponseEntity<Page<Vehicle>> listAll(Pageable pageable) {
+        return ResponseEntity.ok(vehicleService.listAll(pageable));
     }
 
     @GetMapping(path = "/{id}")
@@ -34,7 +37,7 @@ public class VehicleController {
     }
 
     @PostMapping
-    public ResponseEntity<Vehicle> save(@RequestBody Vehicle vehicle) {
+    public ResponseEntity<Vehicle> save(@RequestBody @Valid Vehicle vehicle) {
         return ResponseEntity.ok(vehicleService.save(vehicle));
     }
 

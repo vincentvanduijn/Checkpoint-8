@@ -4,31 +4,42 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Objects;
 @Entity
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class Vehicle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Integer id;
+    private Integer id;
+
     @Column(nullable = false)
-    private final Date createdOn;
+    private Date createdOn;
+
     @ManyToOne
     @JoinColumn(name = "automaker_ID")
-    private final Automaker automaker;
+    private Automaker automaker;
+
     @Column(nullable = false)
-    private final String name;
+    @NotNull
+    @NotEmpty(message = "Please fill in a vehicle name")
+    private String name;
+
     @Column(nullable = false)
-    private final String color;
+    private String color;
+
     @Column(nullable = false)
-    private final int year;
+    private int year;
+
     @ManyToOne
     @JoinColumn(name = "type_ID")
-    private final VehicleType vehicleType;
+    private VehicleType vehicleType;
 
     @Override
     public boolean equals(Object o) {

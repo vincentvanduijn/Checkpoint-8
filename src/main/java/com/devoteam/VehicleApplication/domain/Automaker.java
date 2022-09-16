@@ -3,22 +3,21 @@ package com.devoteam.VehicleApplication.domain;
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class Automaker {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Integer id;
-    private final String name;
+    private Integer id;
+    @Column(nullable = false)
+    private String name;
 
     @Override
     public boolean equals(Object o) {
