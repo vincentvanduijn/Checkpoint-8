@@ -14,17 +14,11 @@ import java.util.Objects;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Vehicle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(nullable = false)
-    private Date createdOn;
-
-    @ManyToOne
-    @JoinColumn(name = "automaker_ID")
-    private Automaker automaker;
 
     @Column(nullable = false)
     @NotNull
@@ -37,9 +31,16 @@ public class Vehicle {
     @Column(nullable = false)
     private int year;
 
+    @Column(nullable = false)
+    private Date createdOn;
+
     @ManyToOne
     @JoinColumn(name = "type_ID")
     private VehicleType vehicleType;
+
+    @ManyToOne
+    @JoinColumn(name = "automaker_ID")
+    private Automaker automaker;
 
     @Override
     public boolean equals(Object o) {

@@ -14,7 +14,7 @@ public class VehicleWebMvcConfigurer implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers (List<HandlerMethodArgumentResolver> resolver) {
         PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver = new PageableHandlerMethodArgumentResolver();
-        pageableHandlerMethodArgumentResolver.setFallbackPageable(PageRequest.of(0, 10));
+        pageableHandlerMethodArgumentResolver.setFallbackPageable(PageRequest.of(0, 5));
         resolver.add(pageableHandlerMethodArgumentResolver);
     }
 
