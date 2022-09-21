@@ -1,38 +1,47 @@
-package com.devoteam.VehicleApplication.service;
+package com.devoteam.VehicleApplication.integration;
 
 import com.devoteam.VehicleApplication.domain.Vehicle;
-import com.devoteam.VehicleApplication.exception.ResourceNotFoundException;
 import com.devoteam.VehicleApplication.repository.VehicleRepository;
-import com.devoteam.VehicleApplication.util.Utils;
 import com.devoteam.VehicleApplication.util.VehicleCreator;
+import com.devoteam.VehicleApplication.wrapper.PageableResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.http.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@ExtendWith(SpringExtension.class)
-class VehicleServiceTest {
 
-    @InjectMocks
-    private VehicleService vehicleService;
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class VehicleControllerIT {
 
-    @Mock
+    @Autowired
+    private TestRestTemplate testRestTemplate;
+
+    @LocalServerPort
+    private int port;
+
+    @MockBean
     private VehicleRepository vehicleRepositoryMock;
 
-    @Mock
-    private Utils utilsMock;
+    private static HttpHeaders createJsonHeader() {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        return httpHeaders;
+    }
 
     @BeforeEach
     void setUp() {
@@ -51,10 +60,7 @@ class VehicleServiceTest {
 
         BDDMockito.doNothing().when(vehicleRepositoryMock).delete(ArgumentMatchers.any(Vehicle.class));
 
-        BDDMockito.doNothing().when(vehicleRepositoryMock).save(VehicleCreator.createValidUpdatedVehicle());
-        // Lees de comment onder William ze video (video 28)
-
-        BDDMockito.when(utilsMock.findVehicle(ArgumentMatchers.anyInt(), ArgumentMatchers.any(VehicleRepository.class)))
+        BDDMockito.when(vehicleRepositoryMock.save(VehicleCreator.createValidVehicle()))
                 .thenReturn(VehicleCreator.createValidUpdatedVehicle());
     }
 
@@ -63,7 +69,9 @@ class VehicleServiceTest {
     void listAll_ReturnListOfVehiclesInsidePageObject_WhenSuccessful() {
         String expectedName = VehicleCreator.createValidVehicle().getName();
 
-        Page<Vehicle> vehiclePage = vehicleService.listAll(PageRequest.of(1, 1));
+        Page<Vehicle> vehiclePage = testRestTemplate.exchange("/vehicles", HttpMethod.GET, null,
+                new ParameterizedTypeReference<PageableResponse<Vehicle>>() {
+                }).getBody();
 
         Assertions.assertThat(vehiclePage).isNotNull();
 
@@ -77,7 +85,7 @@ class VehicleServiceTest {
     void findById_ReturnListOfVehiclesInsidePageObject_WhenSuccessful() {
         Integer expectedId = VehicleCreator.createValidVehicle().getId();
 
-        Vehicle vehicle = vehicleService.findById(1);
+        Vehicle vehicle = testRestTemplate.getForObject("/vehicles/1", Vehicle.class);
 
         Assertions.assertThat(vehicle).isNotNull();
 
@@ -87,11 +95,13 @@ class VehicleServiceTest {
     }
 
     @Test
-    @DisplayName("findByName returns a pageable list of vehicles when successful")
-    void findByName_ReturnListOfVehiclesInsidePageObject_WhenSuccessful() {
+    @DisplayName("findByName returns a list of vehicles when successful")
+    void findByName_ReturnListOfVehicles_WhenSuccessful() {
         String expectedName = VehicleCreator.createValidVehicle().getName();
 
-        List<Vehicle> vehicleList = vehicleService.findByName("Malibu");
+        List<Vehicle> vehicleList = testRestTemplate.exchange("/vehicles/find?name = 'Malibu' ",
+                HttpMethod.GET, null, new ParameterizedTypeReference<List<Vehicle>>() {
+                }).getBody();
 
         Assertions.assertThat(vehicleList).isNotNull();
 
@@ -107,7 +117,8 @@ class VehicleServiceTest {
 
         Vehicle vehicleToBeSaved = VehicleCreator.createVehicleToBeSaved();
 
-        Vehicle vehicle = vehicleService.save(vehicleToBeSaved);
+        Vehicle vehicle = testRestTemplate.exchange("/vehicles", HttpMethod.POST,
+                createJsonHyypEntity(vehicleToBeSaved), Vehicle.class).getBody();
 
         Assertions.assertThat(vehicle).isNotNull();
 
@@ -120,34 +131,32 @@ class VehicleServiceTest {
     @DisplayName("delete removes the vehicle when successful")
     void delete_RemovesVehicle_WhenSuccessful() {
 
-        Assertions.assertThatCode(() -> vehicleService.delete(1))
-                .doesNotThrowAnyException();
-    }
+        ResponseEntity<Vehicle> responseEntity = testRestTemplate.exchange("vehicles/1", HttpMethod.DELETE,
+                null, Vehicle.class);
 
-    @Test
-    @DisplayName("delete throws ResourceNotFoundException when the vehicle does not exist")
-    void delete_ThrowsResourceNotFoundException_WhenVehicleDoesNotExist() {
-        BDDMockito.when(
-                        utilsMock.findVehicle(ArgumentMatchers.anyInt(), ArgumentMatchers.any(VehicleRepository.class)))
-                .thenThrow(new ResourceNotFoundException("Vehicle not found"));
+        Assertions.assertThat(responseEntity).isNotNull();
 
-        Assertions.assertThatExceptionOfType(ResourceNotFoundException.class)
-                .isThrownBy(() -> vehicleService.delete(1));
+        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        Assertions.assertThat(responseEntity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("Updates the vehicle when successful")
     void update_UpdatesVehicle_WhenSuccessful() {
-        Integer expectedId = VehicleCreator.createValidUpdatedVehicle().getId();
+        Vehicle validVehicle = VehicleCreator.createValidVehicle();
 
-        Vehicle vehicle = vehicleService.update(VehicleCreator.createValidUpdatedVehicle());
+        ResponseEntity<Vehicle> responseEntity = testRestTemplate.exchange("/vehicles", HttpMethod.PUT,
+                createJsonHyypEntity(validVehicle), Vehicle.class);
 
-        Assertions.assertThat(vehicle).isNotNull();
+        Assertions.assertThat(responseEntity).isNotNull();
 
-        Assertions.assertThat(vehicle.getId()).isNotNull();
+        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        Assertions.assertThat(vehicle.getId()).isEqualTo(expectedId);
+        Assertions.assertThat(responseEntity.getBody()).isNull();
+    }
 
-        // bespreken met Jens
+    private HttpEntity<Vehicle> createJsonHyypEntity(Vehicle vehicle) {
+        return new HttpEntity<>(vehicle, createJsonHeader());
     }
 }

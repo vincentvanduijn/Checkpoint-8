@@ -36,9 +36,10 @@ public class VehicleService {
         vehicleRepository.delete(utils.findVehicle(id, vehicleRepository));
     }
 
-    public void update(Vehicle vehicle) {
+    public Vehicle update(Vehicle vehicle) {
         // nog checken of het ID bestaat voor de update plaatsvindt
         vehicleRepository.save(vehicle);
+        return vehicle;
     }
 
     public Page<Vehicle> listAll(Pageable pageable) {

@@ -20,8 +20,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 
 @ExtendWith(SpringExtension.class)
 class VehicleControllerTest {
@@ -70,7 +68,7 @@ class VehicleControllerTest {
     void findById_ReturnListOfVehiclesInsidePageObject_WhenSuccessful() {
         Integer expectedId = VehicleCreator.createValidVehicle().getId();
 
-       Vehicle vehicle = vehicleController.findById(1).getBody();
+        Vehicle vehicle = vehicleController.findById(1).getBody();
 
         Assertions.assertThat(vehicle).isNotNull();
 
@@ -80,8 +78,8 @@ class VehicleControllerTest {
     }
 
     @Test
-    @DisplayName("findByName returns a pageable list of vehicles when successful")
-    void findByName_ReturnListOfVehiclesInsidePageObject_WhenSuccessful() {
+    @DisplayName("findByName returns a list of vehicles when successful")
+    void findByName_ReturnListOfVehicles_WhenSuccessful() {
         String expectedName = VehicleCreator.createValidVehicle().getName();
 
         List<Vehicle> vehicleList = vehicleController.findByName("Malibu").getBody();
@@ -125,17 +123,14 @@ class VehicleControllerTest {
     @Test
     @DisplayName("Updates the vehicle when successful")
     void update_UpdatesVehicle_WhenSuccessful() {
-        Vehicle validUpdatedVehicle = VehicleCreator.createValidUpdatedVehicle();
 
-        String expectedName = validUpdatedVehicle.getName();
+        ResponseEntity<Vehicle> responseEntity = vehicleController.update(VehicleCreator.createValidUpdatedVehicle());
 
-        Vehicle vehicle = vehicleController.update(VehicleCreator.createValidUpdatedVehicle()).getBody();
+        Assertions.assertThat(responseEntity).isNotNull();
 
-        Assertions.assertThat(vehicle).isNotNull();
+        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        Assertions.assertThat(vehicle.getId()).isNotNull();
-
-        Assertions.assertThat(vehicle.getName()).isEqualTo(expectedName);
+        Assertions.assertThat(responseEntity.getBody()).isNull();
     }
 
 }
