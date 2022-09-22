@@ -68,7 +68,7 @@ class VehicleControllerTest {
     void findById_ReturnListOfVehiclesInsidePageObject_WhenSuccessful() {
         Integer expectedId = VehicleCreator.createValidVehicle().getId();
 
-        Vehicle vehicle = vehicleController.findById(1).getBody();
+        Vehicle vehicle = vehicleController.findById(1, null).getBody();
 
         Assertions.assertThat(vehicle).isNotNull();
 

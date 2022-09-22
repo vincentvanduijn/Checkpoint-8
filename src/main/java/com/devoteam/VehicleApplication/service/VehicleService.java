@@ -27,6 +27,7 @@ public class VehicleService {
     public Vehicle findById(int id) {
         return utils.findVehicle(id, vehicleRepository);
     }
+
     @Transactional
     public Vehicle save(Vehicle vehicle) {
         return vehicleRepository.save(vehicle);

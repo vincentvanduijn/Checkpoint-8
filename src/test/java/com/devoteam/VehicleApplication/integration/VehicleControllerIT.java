@@ -11,10 +11,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -29,13 +34,41 @@ import java.util.Optional;
 class VehicleControllerIT {
 
     @Autowired
-    private TestRestTemplate testRestTemplate;
+    @Qualifier(value = "testRestTemplateRoleUser")
+    private TestRestTemplate testRestTemplateUser;
+
+    @Autowired
+    @Qualifier(value = "testRestTemplateRoleAdmin")
+    private TestRestTemplate testRestTemplateAdmin;
+
 
     @LocalServerPort
     private int port;
 
     @MockBean
     private VehicleRepository vehicleRepositoryMock;
+
+    @TestConfiguration
+    static class Config {
+
+        @Bean(name = "testRestTemplateRoleUser")
+        public TestRestTemplate testRestTemplateRolesUserCreator(@Value("${local.server.port}") int port) {
+            RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder()
+                    .rootUri("http://localhost:" + port)
+                    .basicAuthentication("USER", "root");
+
+            return new TestRestTemplate(restTemplateBuilder);
+        }
+
+        @Bean(name = "testRestTemplateRoleAdmin")
+        public TestRestTemplate testRestTemplateRolesAdminCreator(@Value("${local.server.port}") int port) {
+            RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder()
+                    .rootUri("http://localhost:" + port)
+                    .basicAuthentication("ADMIN", "root");
+
+            return new TestRestTemplate(restTemplateBuilder);
+        }
+    }
 
     private static HttpHeaders createJsonHeader() {
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -69,7 +102,7 @@ class VehicleControllerIT {
     void listAll_ReturnListOfVehiclesInsidePageObject_WhenSuccessful() {
         String expectedName = VehicleCreator.createValidVehicle().getName();
 
-        Page<Vehicle> vehiclePage = testRestTemplate.exchange("/vehicles", HttpMethod.GET, null,
+        Page<Vehicle> vehiclePage = testRestTemplateUser.exchange("/vehicles", HttpMethod.GET, null,
                 new ParameterizedTypeReference<PageableResponse<Vehicle>>() {
                 }).getBody();
 
@@ -85,7 +118,7 @@ class VehicleControllerIT {
     void findById_ReturnListOfVehiclesInsidePageObject_WhenSuccessful() {
         Integer expectedId = VehicleCreator.createValidVehicle().getId();
 
-        Vehicle vehicle = testRestTemplate.getForObject("/vehicles/1", Vehicle.class);
+        Vehicle vehicle = testRestTemplateUser.getForObject("/vehicles/1", Vehicle.class);
 
         Assertions.assertThat(vehicle).isNotNull();
 
@@ -99,7 +132,7 @@ class VehicleControllerIT {
     void findByName_ReturnListOfVehicles_WhenSuccessful() {
         String expectedName = VehicleCreator.createValidVehicle().getName();
 
-        List<Vehicle> vehicleList = testRestTemplate.exchange("/vehicles/find?name = 'Malibu' ",
+        List<Vehicle> vehicleList = testRestTemplateUser.exchange("/vehicles/find?name = 'Malibu' ",
                 HttpMethod.GET, null, new ParameterizedTypeReference<List<Vehicle>>() {
                 }).getBody();
 
@@ -117,7 +150,7 @@ class VehicleControllerIT {
 
         Vehicle vehicleToBeSaved = VehicleCreator.createVehicleToBeSaved();
 
-        Vehicle vehicle = testRestTemplate.exchange("/vehicles", HttpMethod.POST,
+        Vehicle vehicle = testRestTemplateAdmin.exchange("/vehicles/admin", HttpMethod.POST,
                 createJsonHyypEntity(vehicleToBeSaved), Vehicle.class).getBody();
 
         Assertions.assertThat(vehicle).isNotNull();
@@ -131,7 +164,7 @@ class VehicleControllerIT {
     @DisplayName("delete removes the vehicle when successful")
     void delete_RemovesVehicle_WhenSuccessful() {
 
-        ResponseEntity<Vehicle> responseEntity = testRestTemplate.exchange("vehicles/1", HttpMethod.DELETE,
+        ResponseEntity<Vehicle> responseEntity = testRestTemplateAdmin.exchange("vehicles/admin/1", HttpMethod.DELETE,
                 null, Vehicle.class);
 
         Assertions.assertThat(responseEntity).isNotNull();
@@ -140,13 +173,24 @@ class VehicleControllerIT {
 
         Assertions.assertThat(responseEntity.getBody()).isNull();
     }
+    @Test
+    @DisplayName("delete returns forbidden when user does not have the role admin")
+    void delete_Returns403_WhenUserIsNotAdmin() {
+
+        ResponseEntity<Vehicle> responseEntity = testRestTemplateAdmin.exchange("vehicles/admin/1", HttpMethod.DELETE,
+                null, Vehicle.class);
+
+        Assertions.assertThat(responseEntity).isNotNull();
+
+        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
 
     @Test
     @DisplayName("Updates the vehicle when successful")
     void update_UpdatesVehicle_WhenSuccessful() {
         Vehicle validVehicle = VehicleCreator.createValidVehicle();
 
-        ResponseEntity<Vehicle> responseEntity = testRestTemplate.exchange("/vehicles", HttpMethod.PUT,
+        ResponseEntity<Vehicle> responseEntity = testRestTemplateAdmin.exchange("/vehicles/admin", HttpMethod.PUT,
                 createJsonHyypEntity(validVehicle), Vehicle.class);
 
         Assertions.assertThat(responseEntity).isNotNull();

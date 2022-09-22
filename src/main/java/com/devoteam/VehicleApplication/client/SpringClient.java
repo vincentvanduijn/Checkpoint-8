@@ -5,16 +5,17 @@ import com.devoteam.VehicleApplication.wrapper.PageableResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Arrays;
-import java.util.List;
 
 
 @Log4j2
 public class SpringClient {
 
     public static void main(String[] args) {
+        log.info(new BCryptPasswordEncoder().encode("root"));
+
+
         ResponseEntity<PageableResponse<Vehicle>> exchangeVehicle = new RestTemplate()
                 .exchange("http://localhost:8080/vehicles", HttpMethod.GET, null,
                         new ParameterizedTypeReference<PageableResponse<Vehicle>>() {

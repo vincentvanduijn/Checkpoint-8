@@ -141,6 +141,16 @@
 // To Do: Ask if Parsing links (name=&Id=) matter if you have a option in Swagger to fill those criteria in the GET command (Ask Jens) 
 // To Do: Ask Jens about the update method in the ServiceTest
 // To Do: Check for errors in your Tests
+// To Do: Log in page does not show before the index, localhost:8080/login?logout does work
+
+//---------22-9-2022------------
+// To Do: After refactoring the code to the 4th point (mySQL running in a docker compose file) of checkpoint 8, make sure you look at the tips from last checkpoint 
+// To Do: For the Delete option, check if you can print the deleted object
+// To Do: Ask if Parsing links (name=&Id=) matter if you have a option in Swagger to fill those criteria in the GET command (Ask Jens) (see the VehicleWebMvcConfigurer
+// To Do: Ask Jens about the update method in the ServiceTest
+// To Do: Check for errors in your Tests
+// To Do: Log in page does not show before the index, localhost:8080/login?logout does work
+// To Do: Hide the ID from the endpoints
 
 
 

@@ -1,5 +1,6 @@
 package com.devoteam.VehicleApplication.domain;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -23,12 +24,15 @@ public class Vehicle {
     @Column(nullable = false)
     @NotNull
     @NotEmpty(message = "Please fill in a vehicle name")
+    @Schema(description = "Please fill in a vehicle name", required = true)
     private String name;
 
     @Column(nullable = false)
+    @Schema(description = "Please state the color of the vehicle", required = true)
     private String color;
 
     @Column(nullable = false)
+    @Schema(description = "Please fill in the year of release of the vehicle", required = true)
     private int year;
 
     @Column(nullable = false)
