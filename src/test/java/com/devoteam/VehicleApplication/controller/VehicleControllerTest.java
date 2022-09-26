@@ -37,7 +37,7 @@ class VehicleControllerTest {
         BDDMockito.when(vehicleServiceMock.findById(ArgumentMatchers.anyInt()))
                 .thenReturn(VehicleCreator.createValidVehicle());
 
-        BDDMockito.when(vehicleServiceMock.findByName(ArgumentMatchers.anyString()))
+        BDDMockito.when(vehicleServiceMock.findByModel(ArgumentMatchers.anyString()))
                 .thenReturn(List.of(VehicleCreator.createValidVehicle()));
 
         BDDMockito.when(vehicleServiceMock.save(VehicleCreator.createVehicleToBeSaved()))
@@ -45,22 +45,20 @@ class VehicleControllerTest {
 
         BDDMockito.doNothing().when(vehicleServiceMock).delete(ArgumentMatchers.anyInt());
 
-        BDDMockito.doNothing().when(vehicleServiceMock).update(VehicleCreator.createValidUpdatedVehicle());
-        // Lees de comment onder William ze video (video 28)
+        BDDMockito.when(vehicleServiceMock.save(VehicleCreator.createValidVehicle()))
+                .thenReturn(VehicleCreator.createValidUpdatedVehicle());
     }
 
     @Test
     @DisplayName("listAll returns a pageable list of vehicles when successful")
     void listAll_ReturnListOfVehiclesInsidePageObject_WhenSuccessful() {
-        String expectedName = VehicleCreator.createValidVehicle().getName();
+        String expectedName = VehicleCreator.createValidVehicle().getModel();
 
         Page<Vehicle> vehiclePage = vehicleController.listAll(null).getBody();
 
         Assertions.assertThat(vehiclePage).isNotNull();
-
         Assertions.assertThat(vehiclePage.toList()).isNotEmpty();
-
-        Assertions.assertThat(vehiclePage.toList().get(0).getName()).isEqualTo(expectedName);
+        Assertions.assertThat(vehiclePage.toList().get(0).getModel()).isEqualTo(expectedName);
     }
 
     @Test
@@ -71,53 +69,45 @@ class VehicleControllerTest {
         Vehicle vehicle = vehicleController.findById(1, null).getBody();
 
         Assertions.assertThat(vehicle).isNotNull();
-
         Assertions.assertThat(vehicle.getId()).isNotNull();
-
         Assertions.assertThat(vehicle.getId()).isEqualTo(expectedId);
     }
 
     @Test
     @DisplayName("findByName returns a list of vehicles when successful")
     void findByName_ReturnListOfVehicles_WhenSuccessful() {
-        String expectedName = VehicleCreator.createValidVehicle().getName();
+        String expectedName = VehicleCreator.createValidVehicle().getModel();
 
         List<Vehicle> vehicleList = vehicleController.findByName("Malibu").getBody();
 
         Assertions.assertThat(vehicleList).isNotNull();
-
         Assertions.assertThat(vehicleList).isNotEmpty();
-
-        Assertions.assertThat(vehicleList.get(0).getName()).isEqualTo(expectedName);
+        Assertions.assertThat(vehicleList.get(0).getModel()).isEqualTo(expectedName);
     }
 
     @Test
     @DisplayName("save creates an vehicle when successful")
     void save_CreatesVehicle_WhenSuccessful() {
         Integer expectedId = VehicleCreator.createValidVehicle().getId();
-
         Vehicle vehicleToBeSaved = VehicleCreator.createVehicleToBeSaved();
 
         Vehicle vehicle = vehicleController.save(vehicleToBeSaved).getBody();
 
         Assertions.assertThat(vehicle).isNotNull();
-
         Assertions.assertThat(vehicle.getId()).isNotNull();
-
         Assertions.assertThat(vehicle.getId()).isEqualTo(expectedId);
     }
 
     @Test
     @DisplayName("delete removes the vehicle when successful")
     void delete_RemovesVehicle_WhenSuccessful() {
+        Vehicle vehicleToDelete = VehicleCreator.createValidVehicle();
 
-        ResponseEntity<Vehicle> responseEntity = vehicleController.delete(1);
+        ResponseEntity<Vehicle> responseEntity = vehicleController.delete(vehicleToDelete.getId());
 
         Assertions.assertThat(responseEntity).isNotNull();
-
-        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-
-        Assertions.assertThat(responseEntity.getBody()).isNull();
+        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(responseEntity.getBody().getId()).isEqualTo(vehicleToDelete.getId());
     }
 
     @Test
@@ -127,9 +117,7 @@ class VehicleControllerTest {
         ResponseEntity<Vehicle> responseEntity = vehicleController.update(VehicleCreator.createValidUpdatedVehicle());
 
         Assertions.assertThat(responseEntity).isNotNull();
-
         Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-
         Assertions.assertThat(responseEntity.getBody()).isNull();
     }
 

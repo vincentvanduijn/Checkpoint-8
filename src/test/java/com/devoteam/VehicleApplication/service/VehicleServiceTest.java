@@ -43,7 +43,7 @@ class VehicleServiceTest {
         BDDMockito.when(vehicleRepositoryMock.findById(ArgumentMatchers.anyInt()))
                 .thenReturn(Optional.of(VehicleCreator.createValidVehicle()));
 
-        BDDMockito.when(vehicleRepositoryMock.findByName(ArgumentMatchers.anyString()))
+        BDDMockito.when(vehicleRepositoryMock.findByModel(ArgumentMatchers.anyString()))
                 .thenReturn(List.of(VehicleCreator.createValidVehicle()));
 
         BDDMockito.when(vehicleRepositoryMock.save(VehicleCreator.createVehicleToBeSaved()))
@@ -51,8 +51,8 @@ class VehicleServiceTest {
 
         BDDMockito.doNothing().when(vehicleRepositoryMock).delete(ArgumentMatchers.any(Vehicle.class));
 
-        BDDMockito.doNothing().when(vehicleRepositoryMock).save(VehicleCreator.createValidUpdatedVehicle());
-        // Lees de comment onder William ze video (video 28)
+        BDDMockito.when(vehicleRepositoryMock.save(VehicleCreator.createValidVehicle()))
+                .thenReturn(VehicleCreator.createValidUpdatedVehicle());
 
         BDDMockito.when(utilsMock.findVehicle(ArgumentMatchers.anyInt(), ArgumentMatchers.any(VehicleRepository.class)))
                 .thenReturn(VehicleCreator.createValidUpdatedVehicle());
@@ -61,15 +61,13 @@ class VehicleServiceTest {
     @Test
     @DisplayName("listAll returns a pageable list of vehicles when successful")
     void listAll_ReturnListOfVehiclesInsidePageObject_WhenSuccessful() {
-        String expectedName = VehicleCreator.createValidVehicle().getName();
+        String expectedName = VehicleCreator.createValidVehicle().getModel();
 
         Page<Vehicle> vehiclePage = vehicleService.listAll(PageRequest.of(1, 1));
 
         Assertions.assertThat(vehiclePage).isNotNull();
-
         Assertions.assertThat(vehiclePage.toList()).isNotEmpty();
-
-        Assertions.assertThat(vehiclePage.toList().get(0).getName()).isEqualTo(expectedName);
+        Assertions.assertThat(vehiclePage.toList().get(0).getModel()).isEqualTo(expectedName);
     }
 
     @Test
@@ -80,39 +78,32 @@ class VehicleServiceTest {
         Vehicle vehicle = vehicleService.findById(1);
 
         Assertions.assertThat(vehicle).isNotNull();
-
         Assertions.assertThat(vehicle.getId()).isNotNull();
-
         Assertions.assertThat(vehicle.getId()).isEqualTo(expectedId);
     }
 
     @Test
     @DisplayName("findByName returns a pageable list of vehicles when successful")
     void findByName_ReturnListOfVehiclesInsidePageObject_WhenSuccessful() {
-        String expectedName = VehicleCreator.createValidVehicle().getName();
+        String expectedName = VehicleCreator.createValidVehicle().getModel();
 
-        List<Vehicle> vehicleList = vehicleService.findByName("Malibu");
+        List<Vehicle> vehicleList = vehicleService.findByModel("Malibu");
 
         Assertions.assertThat(vehicleList).isNotNull();
-
         Assertions.assertThat(vehicleList).isNotEmpty();
-
-        Assertions.assertThat(vehicleList.get(0).getName()).isEqualTo(expectedName);
+        Assertions.assertThat(vehicleList.get(0).getModel()).isEqualTo(expectedName);
     }
 
     @Test
     @DisplayName("save creates an vehicle when successful")
     void save_CreatesVehicle_WhenSuccessful() {
         Integer expectedId = VehicleCreator.createValidVehicle().getId();
-
         Vehicle vehicleToBeSaved = VehicleCreator.createVehicleToBeSaved();
 
         Vehicle vehicle = vehicleService.save(vehicleToBeSaved);
 
         Assertions.assertThat(vehicle).isNotNull();
-
         Assertions.assertThat(vehicle.getId()).isNotNull();
-
         Assertions.assertThat(vehicle.getId()).isEqualTo(expectedId);
     }
 
@@ -143,11 +134,8 @@ class VehicleServiceTest {
         Vehicle vehicle = vehicleService.update(VehicleCreator.createValidUpdatedVehicle());
 
         Assertions.assertThat(vehicle).isNotNull();
-
         Assertions.assertThat(vehicle.getId()).isNotNull();
-
         Assertions.assertThat(vehicle.getId()).isEqualTo(expectedId);
 
-        // bespreken met Jens
     }
 }

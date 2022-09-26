@@ -25,7 +25,7 @@ public class Vehicle {
     @NotNull
     @NotEmpty(message = "Please fill in a vehicle name")
     @Schema(description = "Please fill in a vehicle name", required = true)
-    private String name;
+    private String model;
 
     @Column(nullable = false)
     @Schema(description = "Please state the color of the vehicle", required = true)

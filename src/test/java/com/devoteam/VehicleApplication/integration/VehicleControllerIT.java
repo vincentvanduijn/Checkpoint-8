@@ -48,6 +48,125 @@ class VehicleControllerIT {
     @MockBean
     private VehicleRepository vehicleRepositoryMock;
 
+    private static HttpHeaders createJsonHeader() {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        return httpHeaders;
+    }
+
+    @BeforeEach
+    void setUp() {
+        PageImpl<Vehicle> vehiclePage = new PageImpl<>(List.of(VehicleCreator.createValidVehicle()));
+        BDDMockito.when(vehicleRepositoryMock.findAll(ArgumentMatchers.any(PageRequest.class)))
+                .thenReturn(vehiclePage);
+
+        BDDMockito.when(vehicleRepositoryMock.findById(ArgumentMatchers.anyInt()))
+                .thenReturn(Optional.of(VehicleCreator.createValidVehicle()));
+
+        BDDMockito.when(vehicleRepositoryMock.findByModel(ArgumentMatchers.anyString()))
+                .thenReturn(List.of(VehicleCreator.createValidVehicle()));
+
+        BDDMockito.when(vehicleRepositoryMock.save(VehicleCreator.createVehicleToBeSaved()))
+                .thenReturn(VehicleCreator.createValidVehicle());
+
+        BDDMockito.doNothing().when(vehicleRepositoryMock).delete(ArgumentMatchers.any(Vehicle.class));
+
+        BDDMockito.when(vehicleRepositoryMock.save(VehicleCreator.createValidVehicle()))
+                .thenReturn(VehicleCreator.createValidUpdatedVehicle());
+    }
+
+    @Test
+    @DisplayName("listAll returns a pageable list of vehicles when successful")
+    void listAll_ReturnListOfVehiclesInsidePageObject_WhenSuccessful() {
+        String expectedName = VehicleCreator.createValidVehicle().getModel();
+
+        Page<Vehicle> vehiclePage = testRestTemplateUser.exchange("/vehicles", HttpMethod.GET, null,
+                new ParameterizedTypeReference<PageableResponse<Vehicle>>() {
+                }).getBody();
+
+        Assertions.assertThat(vehiclePage).isNotNull();
+        Assertions.assertThat(vehiclePage.toList()).isNotEmpty();
+        Assertions.assertThat(vehiclePage.toList().get(0).getModel()).isEqualTo(expectedName);
+    }
+
+    @Test
+    @DisplayName("findById returns an vehicle when successful")
+    void findById_ReturnListOfVehiclesInsidePageObject_WhenSuccessful() {
+        Integer expectedId = VehicleCreator.createValidVehicle().getId();
+
+        Vehicle vehicle = testRestTemplateUser.getForObject("/vehicles/1", Vehicle.class);
+
+        Assertions.assertThat(vehicle).isNotNull();
+        Assertions.assertThat(vehicle.getId()).isNotNull();
+        Assertions.assertThat(vehicle.getId()).isEqualTo(expectedId);
+    }
+
+    @Test
+    @DisplayName("findByName returns a list of vehicles when successful")
+    void findByName_ReturnListOfVehicles_WhenSuccessful() {
+        String expectedName = VehicleCreator.createValidVehicle().getModel();
+
+        List<Vehicle> vehicleList = testRestTemplateUser.exchange("/vehicles/find?name = 'Malibu' ",
+                HttpMethod.GET, null, new ParameterizedTypeReference<List<Vehicle>>() {
+                }).getBody();
+
+        Assertions.assertThat(vehicleList).isNotNull();
+        Assertions.assertThat(vehicleList).isNotEmpty();
+        Assertions.assertThat(vehicleList.get(0).getModel()).isEqualTo(expectedName);
+    }
+
+    @Test
+    @DisplayName("save creates an vehicle when successful")
+    void save_CreatesVehicle_WhenSuccessful() {
+        Integer expectedId = VehicleCreator.createValidVehicle().getId();
+        Vehicle vehicleToBeSaved = VehicleCreator.createVehicleToBeSaved();
+
+        Vehicle vehicle = testRestTemplateAdmin.exchange("/vehicles/admin", HttpMethod.POST,
+                createJsonHyypEntity(vehicleToBeSaved), Vehicle.class).getBody();
+
+        Assertions.assertThat(vehicle).isNotNull();
+        Assertions.assertThat(vehicle.getId()).isNotNull();
+        Assertions.assertThat(vehicle.getId()).isEqualTo(expectedId);
+    }
+
+    @Test
+    @DisplayName("delete removes the vehicle when successful")
+    void delete_RemovesVehicle_WhenSuccessful() {
+        ResponseEntity<Vehicle> responseEntity = testRestTemplateAdmin.exchange("vehicles/admin/1", HttpMethod.DELETE,
+                null, Vehicle.class);
+
+        Assertions.assertThat(responseEntity).isNotNull();
+        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        Assertions.assertThat(responseEntity.getBody()).isNull();
+    }
+
+    @Test
+    @DisplayName("delete returns forbidden when user does not have the role admin")
+    void delete_Returns403_WhenUserIsNotAdmin() {
+        ResponseEntity<Vehicle> responseEntity = testRestTemplateAdmin.exchange("vehicles/admin/1", HttpMethod.DELETE,
+                null, Vehicle.class);
+
+        Assertions.assertThat(responseEntity).isNotNull();
+        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("Updates the vehicle when successful")
+    void update_UpdatesVehicle_WhenSuccessful() {
+        Vehicle validVehicle = VehicleCreator.createValidVehicle();
+
+        ResponseEntity<Vehicle> responseEntity = testRestTemplateAdmin.exchange("/vehicles/admin", HttpMethod.PUT,
+                createJsonHyypEntity(validVehicle), Vehicle.class);
+
+        Assertions.assertThat(responseEntity).isNotNull();
+        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        Assertions.assertThat(responseEntity.getBody()).isNull();
+    }
+
+    private HttpEntity<Vehicle> createJsonHyypEntity(Vehicle vehicle) {
+        return new HttpEntity<>(vehicle, createJsonHeader());
+    }
+
     @TestConfiguration
     static class Config {
 
@@ -68,139 +187,5 @@ class VehicleControllerIT {
 
             return new TestRestTemplate(restTemplateBuilder);
         }
-    }
-
-    private static HttpHeaders createJsonHeader() {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        return httpHeaders;
-    }
-
-    @BeforeEach
-    void setUp() {
-        PageImpl<Vehicle> vehiclePage = new PageImpl<>(List.of(VehicleCreator.createValidVehicle()));
-        BDDMockito.when(vehicleRepositoryMock.findAll(ArgumentMatchers.any(PageRequest.class)))
-                .thenReturn(vehiclePage);
-
-        BDDMockito.when(vehicleRepositoryMock.findById(ArgumentMatchers.anyInt()))
-                .thenReturn(Optional.of(VehicleCreator.createValidVehicle()));
-
-        BDDMockito.when(vehicleRepositoryMock.findByName(ArgumentMatchers.anyString()))
-                .thenReturn(List.of(VehicleCreator.createValidVehicle()));
-
-        BDDMockito.when(vehicleRepositoryMock.save(VehicleCreator.createVehicleToBeSaved()))
-                .thenReturn(VehicleCreator.createValidVehicle());
-
-        BDDMockito.doNothing().when(vehicleRepositoryMock).delete(ArgumentMatchers.any(Vehicle.class));
-
-        BDDMockito.when(vehicleRepositoryMock.save(VehicleCreator.createValidVehicle()))
-                .thenReturn(VehicleCreator.createValidUpdatedVehicle());
-    }
-
-    @Test
-    @DisplayName("listAll returns a pageable list of vehicles when successful")
-    void listAll_ReturnListOfVehiclesInsidePageObject_WhenSuccessful() {
-        String expectedName = VehicleCreator.createValidVehicle().getName();
-
-        Page<Vehicle> vehiclePage = testRestTemplateUser.exchange("/vehicles", HttpMethod.GET, null,
-                new ParameterizedTypeReference<PageableResponse<Vehicle>>() {
-                }).getBody();
-
-        Assertions.assertThat(vehiclePage).isNotNull();
-
-        Assertions.assertThat(vehiclePage.toList()).isNotEmpty();
-
-        Assertions.assertThat(vehiclePage.toList().get(0).getName()).isEqualTo(expectedName);
-    }
-
-    @Test
-    @DisplayName("findById returns an vehicle when successful")
-    void findById_ReturnListOfVehiclesInsidePageObject_WhenSuccessful() {
-        Integer expectedId = VehicleCreator.createValidVehicle().getId();
-
-        Vehicle vehicle = testRestTemplateUser.getForObject("/vehicles/1", Vehicle.class);
-
-        Assertions.assertThat(vehicle).isNotNull();
-
-        Assertions.assertThat(vehicle.getId()).isNotNull();
-
-        Assertions.assertThat(vehicle.getId()).isEqualTo(expectedId);
-    }
-
-    @Test
-    @DisplayName("findByName returns a list of vehicles when successful")
-    void findByName_ReturnListOfVehicles_WhenSuccessful() {
-        String expectedName = VehicleCreator.createValidVehicle().getName();
-
-        List<Vehicle> vehicleList = testRestTemplateUser.exchange("/vehicles/find?name = 'Malibu' ",
-                HttpMethod.GET, null, new ParameterizedTypeReference<List<Vehicle>>() {
-                }).getBody();
-
-        Assertions.assertThat(vehicleList).isNotNull();
-
-        Assertions.assertThat(vehicleList).isNotEmpty();
-
-        Assertions.assertThat(vehicleList.get(0).getName()).isEqualTo(expectedName);
-    }
-
-    @Test
-    @DisplayName("save creates an vehicle when successful")
-    void save_CreatesVehicle_WhenSuccessful() {
-        Integer expectedId = VehicleCreator.createValidVehicle().getId();
-
-        Vehicle vehicleToBeSaved = VehicleCreator.createVehicleToBeSaved();
-
-        Vehicle vehicle = testRestTemplateAdmin.exchange("/vehicles/admin", HttpMethod.POST,
-                createJsonHyypEntity(vehicleToBeSaved), Vehicle.class).getBody();
-
-        Assertions.assertThat(vehicle).isNotNull();
-
-        Assertions.assertThat(vehicle.getId()).isNotNull();
-
-        Assertions.assertThat(vehicle.getId()).isEqualTo(expectedId);
-    }
-
-    @Test
-    @DisplayName("delete removes the vehicle when successful")
-    void delete_RemovesVehicle_WhenSuccessful() {
-
-        ResponseEntity<Vehicle> responseEntity = testRestTemplateAdmin.exchange("vehicles/admin/1", HttpMethod.DELETE,
-                null, Vehicle.class);
-
-        Assertions.assertThat(responseEntity).isNotNull();
-
-        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-
-        Assertions.assertThat(responseEntity.getBody()).isNull();
-    }
-    @Test
-    @DisplayName("delete returns forbidden when user does not have the role admin")
-    void delete_Returns403_WhenUserIsNotAdmin() {
-
-        ResponseEntity<Vehicle> responseEntity = testRestTemplateAdmin.exchange("vehicles/admin/1", HttpMethod.DELETE,
-                null, Vehicle.class);
-
-        Assertions.assertThat(responseEntity).isNotNull();
-
-        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-    }
-
-    @Test
-    @DisplayName("Updates the vehicle when successful")
-    void update_UpdatesVehicle_WhenSuccessful() {
-        Vehicle validVehicle = VehicleCreator.createValidVehicle();
-
-        ResponseEntity<Vehicle> responseEntity = testRestTemplateAdmin.exchange("/vehicles/admin", HttpMethod.PUT,
-                createJsonHyypEntity(validVehicle), Vehicle.class);
-
-        Assertions.assertThat(responseEntity).isNotNull();
-
-        Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-
-        Assertions.assertThat(responseEntity.getBody()).isNull();
-    }
-
-    private HttpEntity<Vehicle> createJsonHyypEntity(Vehicle vehicle) {
-        return new HttpEntity<>(vehicle, createJsonHeader());
     }
 }

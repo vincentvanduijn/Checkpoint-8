@@ -144,13 +144,30 @@
 // To Do: Log in page does not show before the index, localhost:8080/login?logout does work
 
 //---------22-9-2022------------
+// Updated: Ask if Parsing links (name=&Id=) matter if you have a option in Swagger to fill those criteria in the GET command (Ask Jens) (see the VehicleWebMvcConfigurer
+// Updated: Ask Jens about the update method in the ServiceTest
 // To Do: After refactoring the code to the 4th point (mySQL running in a docker compose file) of checkpoint 8, make sure you look at the tips from last checkpoint 
-// To Do: For the Delete option, check if you can print the deleted object
-// To Do: Ask if Parsing links (name=&Id=) matter if you have a option in Swagger to fill those criteria in the GET command (Ask Jens) (see the VehicleWebMvcConfigurer
-// To Do: Ask Jens about the update method in the ServiceTest
+// To Do: For the Delete option in VehicleService, check if you can print the deleted object
 // To Do: Check for errors in your Tests
-// To Do: Log in page does not show before the index, localhost:8080/login?logout does work
-// To Do: Hide the ID from the endpoints
+// To Do: Rework the VehicleServiceTest BDDMockito update + VehicleControllerTest
+
+//---------23-9-2022------------
+// Updated: After refactoring the code to the 4th point (mySQL running in a docker compose file) of checkpoint 8, make sure you look at the tips from last checkpoint 
+// Updated: When entering an non-existent ID in the PUT (update) option, it creates a new vehicle. Is that correct? YES
+// To Do: For the Delete option in VehicleService, check if you can print the deleted object
+// To Do: Check for errors in your Tests (0-6 work VehicleRepositoryTest, 6-6 work VehicleServiceTest, 0-6 work VehicleControllerIT, 0-6 work VehicleControllerTest)
+// To Do: Rework the VehicleServiceTest BDDMockito update + VehicleControllerTest
+// To Do: Add an error to the Get (vehicles/find byname) is the option given if not in the database
+// To Do: Does the VehicleCreator class in test, have to build all aspects of a vehicle? Or is name and ID enough (since the tests pass?)
+
+//---------26-9-2022------------
+// Updated: For the Delete option in VehicleService, check if you can print the deleted object
+// Updated: Add an error to the Get (vehicles/find byname) is the option given if not in the database
+// Updated: Does the VehicleCreator class in test, have to build all aspects of a vehicle? Or is name and ID enough (since the tests pass?)
+// To Do: Check for errors in your Tests (0-6 work VehicleRepositoryTest, 6-6 work VehicleServiceTest, 0-6 work VehicleControllerIT, 6-6 work VehicleControllerTest)
+// To Do: Rework the VehicleServiceTest BDDMockito update + VehicleControllerTest
+// To Do: Check if the new deleteTest is correct in VehicleControllerTest
+
 
 
 

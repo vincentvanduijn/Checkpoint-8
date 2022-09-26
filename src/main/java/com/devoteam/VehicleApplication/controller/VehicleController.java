@@ -1,9 +1,9 @@
 package com.devoteam.VehicleApplication.controller;
 
 import com.devoteam.VehicleApplication.domain.Vehicle;
+import com.devoteam.VehicleApplication.exception.ResourceNotFoundException;
 import com.devoteam.VehicleApplication.service.VehicleService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
@@ -34,14 +34,14 @@ public class VehicleController {
             @ApiResponse(responseCode = "200", description = "Successfully found all the vehicles listed in the database"),
             @ApiResponse(responseCode = "404", description = "Something went wrong, please try again")
     })
-    public ResponseEntity<Page<Vehicle>> listAll(@Parameter(hidden = true) Pageable pageable) {
+    public ResponseEntity<Page<Vehicle>> listAll(Pageable pageable) {
         return ResponseEntity.ok(vehicleService.listAll(pageable));
     }
 
     @GetMapping(path = "/{id}")
     @Operation(description = "Request a overview of all vehicles that match the given ID in the database")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Successfully found the matching vehicle by ID, from the database"),
+            @ApiResponse(responseCode = "200", description = "Successfully found the matching vehicle by ID, from the database"),
             @ApiResponse(responseCode = "404", description = "Something went wrong, please try again")
     })
     public ResponseEntity<Vehicle> findById(@PathVariable int id, @AuthenticationPrincipal UserDetails userDetails) {
@@ -52,18 +52,23 @@ public class VehicleController {
     @GetMapping(path = "/find")
     @Operation(description = "Request a overview of all vehicles that match the given name in the database")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Successfully found the matching vehicle(s) by name, from the database"),
+            @ApiResponse(responseCode = "200", description = "Successfully found the matching vehicle(s) by name, from the database"),
             @ApiResponse(responseCode = "404", description = "Something went wrong, please try again")
     })
     public ResponseEntity<List<Vehicle>> findByName(@RequestParam(value = "name") String name) {
-        return ResponseEntity.ok(vehicleService.findByName(name));
+        List <Vehicle> vehicleList =vehicleService.findByModel(name);
+        if (vehicleList.isEmpty()) {
+            throw new ResourceNotFoundException("No vehicles found with this name");
+        } else {
+            return ResponseEntity.ok(vehicleService.findByModel(name));
+        }
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(description = "Save a vehicle in the database")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Successfully saved the vehicle in the database"),
+            @ApiResponse(responseCode = "200", description = "Successfully saved the vehicle in the database"),
             @ApiResponse(responseCode = "404", description = "Something went wrong, please try again")
     })
     public ResponseEntity<Vehicle> save(@RequestBody @Valid Vehicle vehicle) {
@@ -74,12 +79,13 @@ public class VehicleController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(description = "Delete a vehicle from the database")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Successfully deleted the vehicle from the database"),
+            @ApiResponse(responseCode = "200", description = "Successfully deleted the vehicle from the database"),
             @ApiResponse(responseCode = "404", description = "Something went wrong, please try again")
     })
     public ResponseEntity<Vehicle> delete(@PathVariable int id) {
+        Vehicle deletedVehicle = vehicleService.findById(id);
         vehicleService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(deletedVehicle);
     }
 
     @PutMapping

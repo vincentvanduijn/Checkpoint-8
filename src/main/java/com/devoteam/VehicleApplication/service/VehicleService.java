@@ -18,10 +18,11 @@ import java.util.List;
 public class VehicleService {
 
     private final Utils utils;
+
     private final VehicleRepository vehicleRepository;
 
-    public List<Vehicle> findByName(String name) {
-        return vehicleRepository.findByName(name);
+    public List<Vehicle> findByModel(String model) {
+        return vehicleRepository.findByModel(model);
     }
 
     public Vehicle findById(int id) {
@@ -38,7 +39,6 @@ public class VehicleService {
     }
 
     public Vehicle update(Vehicle vehicle) {
-        // nog checken of het ID bestaat voor de update plaatsvindt
         vehicleRepository.save(vehicle);
         return vehicle;
     }

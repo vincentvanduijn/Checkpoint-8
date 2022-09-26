@@ -23,16 +23,15 @@ public class SpringClient {
 
         log.info("Vehicle list {}" , exchangeVehicle.getBody());
 
-        Vehicle swapCar = Vehicle.builder().name("SwapCar").build();
-        Vehicle swipeCar = Vehicle.builder().name("SwipeCar").build();
-        // error omdat je een Vehicle probeert te builden met null values, wat niet mag
+        Vehicle swapCar = Vehicle.builder().model("SwapCar").build();
+        Vehicle swipeCar = Vehicle.builder().model("SwipeCar").build();
 
         Vehicle swipeCarSaved = new RestTemplate()
                 .exchange("http://localhost:8080/vehicles", HttpMethod.POST, new HttpEntity<>(swipeCar, createJsonHeader()), Vehicle.class).getBody();
 
         log.info("SwipeCar saved id: {}", swipeCarSaved.getId());
 
-        swipeCarSaved.setName("SwipeCar 2.0");
+        swipeCarSaved.setModel("SwipeCar 2.0");
         ResponseEntity<Void> updatedExchange = new RestTemplate()
                 .exchange("http://localhost:8080/vehicles", HttpMethod.POST, new HttpEntity<>(swipeCarSaved, createJsonHeader()), Void.class);
 

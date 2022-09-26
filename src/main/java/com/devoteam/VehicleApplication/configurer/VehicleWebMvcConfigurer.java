@@ -17,6 +17,4 @@ public class VehicleWebMvcConfigurer implements WebMvcConfigurer {
         pageableHandlerMethodArgumentResolver.setFallbackPageable(PageRequest.of(0, 5));
         resolver.add(pageableHandlerMethodArgumentResolver);
     }
-
-    // Does this even work if you have to fill in the Pageable criteria???
 }

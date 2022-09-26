@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.core.Constants;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,57 +24,49 @@ class VehicleRepositoryTest {
 
     @Test
     @DisplayName("Save creates vehicle when successful")
-    void save_PersistVehicle_WhenSuccessful(){
+    void save_PersistVehicle_WhenSuccessful() {
         Vehicle vehicle = VehicleCreator.createVehicleToBeSaved();
 
         Vehicle savedVehicle = this.vehicleRepository.save(vehicle);
         Assertions.assertThat(savedVehicle.getId()).isNotNull();
-        Assertions.assertThat(savedVehicle.getName()).isNotNull();
-        Assertions.assertThat(savedVehicle.getName()).isEqualTo(vehicle.getName());
-
-        // Testen werken niet omdat niet alle variabelen van Vehicle zijn verwerkt
+        Assertions.assertThat(savedVehicle.getModel()).isNotNull();
+        Assertions.assertThat(savedVehicle.getModel()).isEqualTo(vehicle.getModel());
     }
 
     @Test
     @DisplayName("Save updates vehicle when successful")
-    void save_UpdateVehicle_WhenSuccessful(){
+    void save_UpdateVehicle_WhenSuccessful() {
         Vehicle vehicle = VehicleCreator.createVehicleToBeSaved();
-
         Vehicle savedVehicle = this.vehicleRepository.save(vehicle);
-
-        savedVehicle.setName("GoGoCart");
+        savedVehicle.setModel("GoGoCart");
 
         Vehicle updatedVehicle = this.vehicleRepository.save(savedVehicle);
 
         Assertions.assertThat(savedVehicle.getId()).isNotNull();
-        Assertions.assertThat(savedVehicle.getName()).isNotNull();
-        Assertions.assertThat(savedVehicle.getName()).isEqualTo(updatedVehicle.getName());
+        Assertions.assertThat(savedVehicle.getModel()).isNotNull();
+        Assertions.assertThat(savedVehicle.getModel()).isEqualTo(updatedVehicle.getModel());
     }
 
     @Test
     @DisplayName("Delete removes vehicle when successful")
-    void delete_UpdateVehicle_WhenSuccessful(){
+    void delete_UpdateVehicle_WhenSuccessful() {
         Vehicle vehicle = VehicleCreator.createVehicleToBeSaved();
-
         Vehicle savedVehicle = this.vehicleRepository.save(vehicle);
 
         this.vehicleRepository.delete(vehicle);
 
         Optional<Vehicle> vehicleOptional = this.vehicleRepository.findById(savedVehicle.getId());
-
         Assertions.assertThat(vehicleOptional.isEmpty()).isTrue();
     }
 
     @Test
     @DisplayName("Find by name returns vehicle when successful")
-    void findByName_ReturnVehicle_WhenSuccessful(){
+    void findByName_ReturnVehicle_WhenSuccessful() {
         Vehicle vehicle = VehicleCreator.createVehicleToBeSaved();
-
         Vehicle savedVehicle = this.vehicleRepository.save(vehicle);
+        String name = savedVehicle.getModel();
 
-        String name = savedVehicle.getName();
-
-        List<Vehicle> vehicleList = this.vehicleRepository.findByName(name);
+        List<Vehicle> vehicleList = this.vehicleRepository.findByModel(name);
 
         Assertions.assertThat(vehicleList).isNotEmpty();
         Assertions.assertThat(vehicleList).contains(savedVehicle);
@@ -82,22 +74,21 @@ class VehicleRepositoryTest {
 
     @Test
     @DisplayName("Find by name returns empty vehicle list when no vehicle is found")
-    void findByName_ReturnEmptyVehicleList_WhenVehicleNotFound(){
+    void findByName_ReturnEmptyVehicleList_WhenVehicleNotFound() {
         String name = "Fake-name";
 
-        List<Vehicle> vehicleList = this.vehicleRepository.findByName(name);
+        List<Vehicle> vehicleList = this.vehicleRepository.findByModel(name);
 
         Assertions.assertThat(vehicleList).isEmpty();
     }
 
     @Test
     @DisplayName("Save throw ConstraintViolationException when vehicle is empty")
-    void save_ThrowConstraintViolationException_WhenVehicleIsEmpty(){
-       Vehicle vehicle = new Vehicle();
+    void save_ThrowConstraintViolationException_WhenVehicleIsEmpty() {
+        Vehicle vehicle = new Vehicle();
 
-       Assertions.assertThatExceptionOfType(Constants.ConstantException.class)
-               .isThrownBy(() -> vehicleRepository.save(vehicle))
-               .withMessageContaining("Please define the vehicle name");
+        Assertions.assertThatExceptionOfType(DataIntegrityViolationException.class)
+                .isThrownBy(() -> vehicleRepository.save(vehicle));
     }
-    
+
 }

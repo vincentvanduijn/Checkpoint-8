@@ -26,7 +26,7 @@ public class VehicleUser implements UserDetails {
 
     @Column(nullable = false)
     @NotNull
-    @NotEmpty(message = "Please fill in a vehicle name")
+    @NotEmpty(message = "Please fill in a username")
     private String name;
     @Column(unique = true)
     @NotEmpty
