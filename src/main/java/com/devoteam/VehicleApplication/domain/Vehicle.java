@@ -3,6 +3,7 @@ package com.devoteam.VehicleApplication.domain;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -18,6 +19,8 @@ import java.util.Objects;
 @Builder
 public class Vehicle {
     @Id
+    @NotNull
+    @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
@@ -33,7 +36,7 @@ public class Vehicle {
 
     @Column(nullable = false)
     @Schema(description = "Please fill in the year of release of the vehicle", required = true)
-    private int year;
+    private Integer productionYear;
 
     @Column(nullable = false)
     private Date createdOn;
@@ -42,7 +45,7 @@ public class Vehicle {
     @JoinColumn(name = "type_ID")
     private VehicleType vehicleType;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "automaker_ID")
     private Automaker automaker;
 

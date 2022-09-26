@@ -17,7 +17,7 @@ public class Automaker {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(nullable = false)
-    private String name;
+    private String brandName;
 
     @Override
     public boolean equals(Object o) {

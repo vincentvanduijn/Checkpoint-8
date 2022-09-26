@@ -20,6 +20,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -40,10 +41,6 @@ class VehicleControllerIT {
     @Autowired
     @Qualifier(value = "testRestTemplateRoleAdmin")
     private TestRestTemplate testRestTemplateAdmin;
-
-
-    @LocalServerPort
-    private int port;
 
     @MockBean
     private VehicleRepository vehicleRepositoryMock;
@@ -106,7 +103,7 @@ class VehicleControllerIT {
     void findByName_ReturnListOfVehicles_WhenSuccessful() {
         String expectedName = VehicleCreator.createValidVehicle().getModel();
 
-        List<Vehicle> vehicleList = testRestTemplateUser.exchange("/vehicles/find?name = 'Malibu' ",
+        List<Vehicle> vehicleList = testRestTemplateUser.exchange("/vehicles/find?name='TestCar'",
                 HttpMethod.GET, null, new ParameterizedTypeReference<List<Vehicle>>() {
                 }).getBody();
 
@@ -121,8 +118,8 @@ class VehicleControllerIT {
         Integer expectedId = VehicleCreator.createValidVehicle().getId();
         Vehicle vehicleToBeSaved = VehicleCreator.createVehicleToBeSaved();
 
-        Vehicle vehicle = testRestTemplateAdmin.exchange("/vehicles/admin", HttpMethod.POST,
-                createJsonHyypEntity(vehicleToBeSaved), Vehicle.class).getBody();
+        Vehicle vehicle = testRestTemplateAdmin.exchange("/vehicles", HttpMethod.POST,
+                createJsonHttpEntity(vehicleToBeSaved), Vehicle.class).getBody();
 
         Assertions.assertThat(vehicle).isNotNull();
         Assertions.assertThat(vehicle.getId()).isNotNull();
@@ -132,8 +129,8 @@ class VehicleControllerIT {
     @Test
     @DisplayName("delete removes the vehicle when successful")
     void delete_RemovesVehicle_WhenSuccessful() {
-        ResponseEntity<Vehicle> responseEntity = testRestTemplateAdmin.exchange("vehicles/admin/1", HttpMethod.DELETE,
-                null, Vehicle.class);
+        ResponseEntity<Void> responseEntity = testRestTemplateAdmin.exchange("http://localhost:8080/vehicles/admin/2", HttpMethod.DELETE,
+                null, Void.class);
 
         Assertions.assertThat(responseEntity).isNotNull();
         Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -143,8 +140,8 @@ class VehicleControllerIT {
     @Test
     @DisplayName("delete returns forbidden when user does not have the role admin")
     void delete_Returns403_WhenUserIsNotAdmin() {
-        ResponseEntity<Vehicle> responseEntity = testRestTemplateAdmin.exchange("vehicles/admin/1", HttpMethod.DELETE,
-                null, Vehicle.class);
+        ResponseEntity<Void> responseEntity = testRestTemplateAdmin.exchange("http://localhost:8080/vehicles/admin/1", HttpMethod.DELETE,
+                null, Void.class);
 
         Assertions.assertThat(responseEntity).isNotNull();
         Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -155,18 +152,18 @@ class VehicleControllerIT {
     void update_UpdatesVehicle_WhenSuccessful() {
         Vehicle validVehicle = VehicleCreator.createValidVehicle();
 
-        ResponseEntity<Vehicle> responseEntity = testRestTemplateAdmin.exchange("/vehicles/admin", HttpMethod.PUT,
-                createJsonHyypEntity(validVehicle), Vehicle.class);
+        ResponseEntity<Void> responseEntity = testRestTemplateAdmin.exchange("/vehicles", HttpMethod.PUT,
+                createJsonHttpEntity(validVehicle), Void.class);
 
         Assertions.assertThat(responseEntity).isNotNull();
         Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         Assertions.assertThat(responseEntity.getBody()).isNull();
     }
 
-    private HttpEntity<Vehicle> createJsonHyypEntity(Vehicle vehicle) {
+    private HttpEntity<Vehicle> createJsonHttpEntity(Vehicle vehicle) {
         return new HttpEntity<>(vehicle, createJsonHeader());
     }
-
+    @Lazy
     @TestConfiguration
     static class Config {
 

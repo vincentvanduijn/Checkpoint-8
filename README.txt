@@ -155,7 +155,7 @@
 // Updated: After refactoring the code to the 4th point (mySQL running in a docker compose file) of checkpoint 8, make sure you look at the tips from last checkpoint 
 // Updated: When entering an non-existent ID in the PUT (update) option, it creates a new vehicle. Is that correct? YES
 // To Do: For the Delete option in VehicleService, check if you can print the deleted object
-// To Do: Check for errors in your Tests (0-6 work VehicleRepositoryTest, 6-6 work VehicleServiceTest, 0-6 work VehicleControllerIT, 0-6 work VehicleControllerTest)
+// To Do: Check for errors in your Tests (0-6 work VehicleRepositoryTest, 6-6 work VehicleServiceTest, 2-6 work VehicleControllerIT, 0-6 work VehicleControllerTest)
 // To Do: Rework the VehicleServiceTest BDDMockito update + VehicleControllerTest
 // To Do: Add an error to the Get (vehicles/find byname) is the option given if not in the database
 // To Do: Does the VehicleCreator class in test, have to build all aspects of a vehicle? Or is name and ID enough (since the tests pass?)
@@ -164,7 +164,7 @@
 // Updated: For the Delete option in VehicleService, check if you can print the deleted object
 // Updated: Add an error to the Get (vehicles/find byname) is the option given if not in the database
 // Updated: Does the VehicleCreator class in test, have to build all aspects of a vehicle? Or is name and ID enough (since the tests pass?)
-// To Do: Check for errors in your Tests (0-6 work VehicleRepositoryTest, 6-6 work VehicleServiceTest, 0-6 work VehicleControllerIT, 6-6 work VehicleControllerTest)
+// To Do: Check for errors in your Tests (5-6 work VehicleRepositoryTest, 6-6 work VehicleServiceTest, 0-6 work VehicleControllerIT, 6-6 work VehicleControllerTest)
 // To Do: Rework the VehicleServiceTest BDDMockito update + VehicleControllerTest
 // To Do: Check if the new deleteTest is correct in VehicleControllerTest
 
