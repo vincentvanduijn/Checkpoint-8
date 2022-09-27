@@ -167,7 +167,14 @@
 // To Do: Check for errors in your Tests (5-6 work VehicleRepositoryTest, 6-6 work VehicleServiceTest, 0-6 work VehicleControllerIT, 6-6 work VehicleControllerTest)
 // To Do: Rework the VehicleServiceTest BDDMockito update + VehicleControllerTest
 // To Do: Check if the new deleteTest is correct in VehicleControllerTest
+// To Do: Remove the ID from the post (since you don't have to fill it)
+// To Do: Change the put so that so you don't have to fill in all variables
 
-
+//---------27-9-2022------------
+Checkpoint 8
+// To Do: Check for errors in your Tests (5-6 work VehicleRepositoryTest, 6-6 work VehicleServiceTest, 0-6 work VehicleControllerIT, 6-6 work VehicleControllerTest)
+// To Do: Check if the new deleteTest is correct in VehicleControllerTest
+// To Do: Remove the ID from the post (since you don't have to fill it)
+// To Do: Change the put so that so you don't have to fill in all variables
 
 
